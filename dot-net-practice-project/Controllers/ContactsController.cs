@@ -55,7 +55,7 @@ namespace dot_net_practice_project.Controllers
             var newContact = new Contact();
             newContact.Id = Guid.NewGuid();
             newContact.FullName = requestBody.FullName
-;            newContact.Email = requestBody.Email;
+; newContact.Email = requestBody.Email;
             newContact.Address = requestBody.Address;
             newContact.PhoneNumber = requestBody.PhoneNumber;
             newContact.DateOfCreation = DateOnly.FromDateTime(DateTime.Now);
@@ -63,6 +63,51 @@ namespace dot_net_practice_project.Controllers
             await dbContext.SaveChangesAsync();
 
             return Ok(newContact);
+        }
+
+
+        //Updating a contact
+        [HttpPut]
+        [Route("{id:guid}")]
+        public async Task<IActionResult> UpdateContact(Guid id, ContactRequest requestBody)
+        {
+
+            var contact = await dbContext.Contacts.FindAsync(id);
+
+            if (contact == null)
+            {
+                return NotFound();
+            }
+
+            contact.FullName = requestBody.FullName;
+            contact.Email = requestBody.Email;
+            contact.Address = requestBody.Address;
+            contact.PhoneNumber = requestBody.PhoneNumber;
+            dbContext.Contacts.Update(contact);
+            await dbContext.SaveChangesAsync();
+
+            return Ok(contact);
+        }
+
+
+        //Deleting a contact
+        [HttpDelete]
+        [Route("{id:guid}")]
+        public async Task<IActionResult> DeleteContact(Guid id)
+        {
+
+            var contact = await dbContext.Contacts.FindAsync(id);
+
+            if (contact != null)
+            {
+                dbContext.Remove(contact);
+                await dbContext.SaveChangesAsync();
+                return Ok(contact);
+            }
+
+            return NotFound();
+
+
         }
     }
 }
